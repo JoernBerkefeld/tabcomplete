@@ -1,7 +1,7 @@
 /*!
  * tabcomplete
- * http://github.com/erming/tabcomplete
- * v1.5.0
+ * https://github.com/JoernBerkefeld/tabcomplete/
+ * v1.5.1
  */
 (function($) {
 	var keys = {
@@ -11,17 +11,18 @@
 		down: 40
 	};
 
-	$.tabcomplete = {};
-	$.tabcomplete.defaultOptions = {
-		after: "",
-		arrowKeys: false,    // Allow the use of <up> and <down> keys to iterate
-		hint: "placeholder", // "placeholder", "select", false
-		match: match,
-		caseSensitive: false,
-		minLength: 1,
-		wrapInput: true
+	$.tabcomplete = {
+		version : "1.5.1",
+		defaultOptions : {
+			after: "",
+			arrowKeys: false,    // Allow the use of <up> and <down> keys to iterate
+			hint: "placeholder", // "placeholder", "select", false
+			match: match,
+			caseSensitive: false,
+			minLength: 1,
+			wrapInput: true
+		}
 	};
-
 	$.fn.tab = // Alias
 	$.fn.tabcomplete = function(args, options) {
 		if (this.length > 1) {
@@ -29,7 +30,14 @@
 				$(this).tabcomplete(args, options);
 			});
 		}
-
+		if(!!this.options) {
+			this.options = options = $.extend(
+				$.tabcomplete.defaultOptions,
+				options
+			);
+			this.words = args;
+			return;
+		}
 		// Only enable the plugin on <input> and <textarea> elements.
 		var tag = this.prop("tagName");
 		if (tag != "INPUT" && tag != "TEXTAREA") {
