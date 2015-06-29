@@ -16,7 +16,7 @@
 		defaultOptions : {
 			after: "",
 			arrowKeys: false,    // Allow the use of <up> and <down> keys to iterate
-			hint: "placeholder", // "placeholder", "select", false
+			hint: "none", // "placeholder", "select", "none", false
 			match: match,
 			caseSensitive: false,
 			minLength: 1,
@@ -30,14 +30,14 @@
 				$(this).tabcomplete(args, options);
 			});
 		}
-		if(!!this.options) {
-			this.options = options = $.extend(
-				$.tabcomplete.defaultOptions,
-				options
-			);
-			this.words = args;
-			return;
-		}
+		// if(!!this.options) {
+		// 	this.options = options = $.extend(
+		// 		$.tabcomplete.defaultOptions,
+		// 		options
+		// 	);
+		// 	this.words = args;
+		// 	return;
+		// }
 		// Only enable the plugin on <input> and <textarea> elements.
 		var tag = this.prop("tagName");
 		if (tag != "INPUT" && tag != "TEXTAREA") {
@@ -71,6 +71,10 @@
 
 		case "select":
 			hint = select;
+			break;
+
+		case "none":
+			hint = none;
 			break;
 		}
 
@@ -127,8 +131,10 @@
 				if (key != keys.up) {
 					i++;
 				} else {
-					if (i == -1) return;
-					if (i == 0) {
+					if (i == -1) {
+						return;
+					}
+					if (i === 0) {
 						// Jump to the last word.
 						i = words.length - 1;
 					} else {
@@ -157,9 +163,10 @@
 				// Put the cursor at the end after completion.
 				// This isn't strictly necessary, but solves an issue with
 				// Internet Explorer.
-				if (options.hint == "select") {
+				// if (options.hint == "select") {
 					self[0].selectionStart = text.length;
-				}
+					// self.focus();
+				// }
 
 				// Remember the word until next time.
 				last = word;
@@ -188,7 +195,7 @@
 		}
 
 		return this;
-	}
+	};
 
 	// Simple matching.
 	// Filter the array and return the items that begins with 'word'.
@@ -203,6 +210,46 @@
 				}
 			}
 		);
+	}
+
+	// Show placeholder text.
+	// This works by creating a copy of the input and placing it behind
+	// the real input.
+	function none(word) {
+		var input = this;
+		var clone = input.prev(".hint");
+
+		// input.css({
+		// 	backgroundColor: "transparent",
+		// 	position: "relative",
+		// });
+
+		// Lets create a clone of the input if it does
+		// not already exist.
+		if (!clone.length) {
+			// if (input.options.wrapInput) {
+			// 	input.wrap(
+			// 		$("<div>").css({position: "relative", height: input.css("height"), display: input.css("display")})
+			// 	);
+			// }
+			clone = input
+				.clone()
+				// .attr("tabindex", -1)
+				.removeAttr("id name placeholder")
+				.addClass("hint");
+				// .insertBefore(input);
+			// clone.css({
+			// 	position: "absolute",
+			// });
+		}
+
+		var hint = "";
+		if (typeof word !== "undefined") {
+			var value = input.val();
+			hint = value + word.substr(value.split(/ |\n/).pop().length);
+		}
+
+		clone.val(hint);
 	}
 
 	// Show placeholder text.
